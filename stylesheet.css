@@ -1,0 +1,14 @@
+body {
+background-color: lightblue;
+color: black;
+
+}
+
+h1{
+    color: darkblue;
+    font:color-mix(in hsl shorter hue, color percentage, color percentage);
+}
+
+p{
+
+}
