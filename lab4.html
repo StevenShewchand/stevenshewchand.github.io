@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+    
+var name;
+now = new Date();
+hour = now. getHours ();
+window.alert ("Welcome to my store!");
+name = window.prompt ("Please Enter Your name", "");
+if (hour < 12) {
+document. write ("<h1> Good Morning ")
+} else if (hour <  18) {
+    document. write ("<h1 > Good Afternoon ")
+} 
+else {
+    document.write("<h1> Good Evening ")
+}
+
+    document. writeln(name + ", Welcome to Lab 4</h1>")
+
+var order;
+ order = window.prompt("Whatchu Ordering Bruh:", "")
+
+var numOfItems;
+numOfItems = window.prompt("How many " +order+ "'s do you want?", "")
+
+    document.writeln("<h3>You Ordered: " + numOfItems+" "+order+"('s)</h3>")
+
+  now = new Date();
+  now.setDate(now.getDate()+7);
+document.writeln("Your order will arrive on: " +now);
+
+
+
+    </script>
+    
+<body>
+   
+</body>
+
+</head>
+
+</html>
