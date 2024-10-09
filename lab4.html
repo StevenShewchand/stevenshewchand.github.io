@@ -23,10 +23,18 @@ var order;
  order = window.prompt("Whatchu Ordering Bruh:", "")
 
 var numOfItems;
-numOfItems = window.prompt("How many " +order+ "'s do you want?", "")
+while (true)
+{
+numOfItems = window.prompt("How many " +order+ "'s do you want?", "");
+if (numOfItems && numOfItems>=1&& numOfItems<=99 ){
+    break;}
+    else 
+    alert("U cant have that many bruh...")
+    
+}
 
     document.writeln("<h3>You Ordered: " + numOfItems+" "+order+"('s)</h3>")
-
+ 
   now = new Date();
   now.setDate(now.getDate()+7);
 document.writeln("Your order will arrive on: " +now);
