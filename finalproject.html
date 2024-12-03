@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steven Shewchand Final Project</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <style>
+        .gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .gallery .col {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-dark">
+    <div class="container py-5">
+        <h1 class="text-center mb-4" style="color: white;">Author Image Search</h1>
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <div class="input-group mb-3">
+                    <input type="text" id="authorName" class="form-control" placeholder="Enter author name (partial or full)">
+                    <button class="btn btn-primary" onclick="fetchImages()">Search</button>
+                </div>
+                <button class="btn btn-secondary w-100 mb-3" onclick="fetchAllImages()">Show All Images</button>
+                <button class="btn btn-success w-100 mb-3" onclick="fetchRandomImage()">Show Random Image</button>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <label for="grayscaleCheckbox" class="form-check-label me-2" style="color: white">Grayscale</label>
+                        <input type="checkbox" id="grayscaleCheckbox" class="form-check-input">
+                    </div>
+                    <div>
+                        <label for="blurRange" class="form-label me-2" style="color: white">Blur</label>
+                        <input type="range" id="blurRange" min="0" max="10" step="1" value="0" class="form-range">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="gallery" class="row"></div>
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">Image Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="" class="img-fluid mb-3">
+                    <p><strong>Width:</strong> <span id="modalWidth"></span></p>
+                    <p><strong>Height:</strong> <span id="modalHeight"></span></p>
+                    <p><strong>URL:</strong> <a href="#" id="modalUrl" target="_blank">View Full Image</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchImages() {
+            const authorName = document.getElementById("authorName").value.trim().toLowerCase();
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+
+            if (!authorName) {
+                alert("Please enter an author name.");
+                return;
+            }
+
+            try {
+                const response = await fetch("https://picsum.photos/v2/list");
+                const data = await response.json();
+
+                const filteredImages = data.filter((item) =>
+                    item.author.toLowerCase().includes(authorName)
+                );
+
+                if (filteredImages.length === 0) {
+                    gallery.innerHTML = "<p class='text-center text-danger'>No images found for this author.</p>";
+                    return;
+                }
+
+                displayImages(filteredImages);
+            } catch (error) {
+                console.error("Error fetching images:", error);
+                gallery.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again later.</p>";
+            }
+        }
+
+        async function fetchAllImages() {
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+
+            try {
+                const response = await fetch("https://picsum.photos/v2/list?page=1&limit=100");
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    gallery.innerHTML = "<p class='text-center text-danger'>No images found.</p>";
+                    return;
+                }
+
+                displayImages(data);
+            } catch (error) {
+                console.error("Error fetching all images:", error);
+                gallery.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again later.</p>";
+            }
+        }
+
+        async function fetchRandomImage() {
+            const gallery = document.getElementById("gallery");
+            gallery.innerHTML = "";
+
+            const grayscale = document.getElementById("grayscaleCheckbox").checked;
+            const blur = document.getElementById("blurRange").value;
+
+            try {
+                let randomImageUrl = `https://picsum.photos/seed/${Date.now()}/800/600`;
+                if (grayscale) randomImageUrl += "?grayscale";
+                if (blur > 0) randomImageUrl += `${grayscale ? "&" : "?"}blur=${blur}`;
+
+                const colDiv = document.createElement("div");
+                colDiv.className = "col-md-12 text-center";
+                colDiv.innerHTML = `
+                    <div class="card shadow-sm mx-auto" style="width: 800px;">
+                        <img src="${randomImageUrl}" class="card-img-top" alt="Random Image"
+                             onclick="showImageDetails('${randomImageUrl}', 800, 600, 'Random Image')">
+                    </div>
+                `;
+
+                gallery.appendChild(colDiv);
+            } catch (error) {
+                console.error("Error fetching random image:", error);
+                gallery.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again later.</p>";
+            }
+        }
+
+        function displayImages(images) {
+            const gallery = document.getElementById("gallery");
+            const grayscale = document.getElementById("grayscaleCheckbox").checked;
+            const blur = document.getElementById("blurRange").value;
+
+            gallery.innerHTML = "";
+
+            images.forEach((image) => {
+                let imageUrl = `${image.download_url}?`;
+                if (grayscale) imageUrl += "grayscale&";
+                if (blur > 0) imageUrl += `blur=${blur}`;
+
+                const colDiv = document.createElement("div");
+                colDiv.className = "col-md-4 col-lg-3";
+
+                colDiv.innerHTML = `
+                    <div class="card shadow-sm">
+                        <img src="${imageUrl}" class="card-img-top" alt="Image by ${image.author}"
+                             onclick="showImageDetails('${imageUrl}', ${image.width}, ${image.height}, '${image.author}')">
+                        <div class="card-body">
+                            <p class="card-text text-center"><strong>${image.author}</strong></p>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(colDiv);
+            });
+        }
+
+        function showImageDetails(url, width, height, author) {
+            document.getElementById("modalImage").src = url;
+            document.getElementById("modalWidth").innerText = width;
+            document.getElementById("modalHeight").innerText = height;
+            document.getElementById("modalUrl").href = url;
+            document.getElementById("modalUrl").innerText = url;
+
+            const modal = new bootstrap.Modal(document.getElementById("imageModal"));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
