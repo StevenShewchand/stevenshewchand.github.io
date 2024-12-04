@@ -121,7 +121,7 @@
 
         async function fetchRandomImage() {
             const gallery = document.getElementById("gallery");
-            gallery.innerHTML = "";
+            gallery.innerHTML = ""; // Clear the gallery
 
             const grayscale = document.getElementById("grayscaleCheckbox").checked;
             const blur = document.getElementById("blurRange").value;
@@ -131,16 +131,14 @@
                 if (grayscale) randomImageUrl += "?grayscale";
                 if (blur > 0) randomImageUrl += `${grayscale ? "&" : "?"}blur=${blur}`;
 
-                const colDiv = document.createElement("div");
-                colDiv.className = "col-md-12 text-center";
-                colDiv.innerHTML = `
-                    <div class="card shadow-sm mx-auto" style="width: 800px;">
-                        <img src="${randomImageUrl}" class="card-img-top" alt="Random Image"
-                             onclick="showImageDetails('${randomImageUrl}', 800, 600, 'Random Image')">
+                gallery.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="card shadow-sm mx-auto" style="max-width: 100%;">
+                            <img src="${randomImageUrl}" class="card-img-top img-fluid" alt="Random Image"
+                                 onclick="showImageDetails('${randomImageUrl}', 800, 600, 'Random Image')">
+                        </div>
                     </div>
                 `;
-
-                gallery.appendChild(colDiv);
             } catch (error) {
                 console.error("Error fetching random image:", error);
                 gallery.innerHTML = "<p class='text-center text-danger'>Something went wrong. Please try again later.</p>";
@@ -152,27 +150,29 @@
             const grayscale = document.getElementById("grayscaleCheckbox").checked;
             const blur = document.getElementById("blurRange").value;
 
-            gallery.innerHTML = "";
+            gallery.innerHTML = ""; // Clear the gallery
+
+            let galleryContent = "";
 
             images.forEach((image) => {
                 let imageUrl = `${image.download_url}?`;
                 if (grayscale) imageUrl += "grayscale&";
                 if (blur > 0) imageUrl += `blur=${blur}`;
 
-                const colDiv = document.createElement("div");
-                colDiv.className = "col-md-4 col-lg-3";
-
-                colDiv.innerHTML = `
-                    <div class="card shadow-sm">
-                        <img src="${imageUrl}" class="card-img-top" alt="Image by ${image.author}"
-                             onclick="showImageDetails('${imageUrl}', ${image.width}, ${image.height}, '${image.author}')">
-                        <div class="card-body">
-                            <p class="card-text text-center"><strong>${image.author}</strong></p>
+                galleryContent += `
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="card shadow-sm">
+                            <img src="${imageUrl}" class="card-img-top img-fluid" alt="Image by ${image.author}"
+                                 onclick="showImageDetails('${imageUrl}', ${image.width}, ${image.height}, '${image.author}')">
+                            <div class="card-body text-center">
+                                <p class="card-text"><strong>${image.author}</strong></p>
+                            </div>
                         </div>
                     </div>
                 `;
-                gallery.appendChild(colDiv);
             });
+
+            gallery.innerHTML = galleryContent;
         }
 
         function showImageDetails(url, width, height, author) {
